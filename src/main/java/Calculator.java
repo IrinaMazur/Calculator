@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 /**
  * A class that evaluates the value of an expression.
  */
@@ -106,5 +108,78 @@ public class Calculator {
         }
     }
 
+    /**
+     * A method that determines the operator's priority.
+     * @param Operation Symbol (operator, bracket)
+     * @return Symbol priority
+     */
+    private int Priority(char Operation) {
+        if (Operation == '*' || Operation == '/')
+            return 3;
+        else if (Operation == '+' || Operation == '-')
+            return 2;
+        else if (Operation == '(')
+            return 1;
+        else if (Operation == ')')
+            return -1;
+        return 0;
+    }
+
+    /**
+     * A method that overwrites an expression into a postfix form.
+     * @return True if it was possible to write, otherwise false.
+     */
+    private boolean PostfixForm() {
+
+        if (!Correctness() || Expression.isEmpty())
+            return false;
+
+        else {
+            Stack<Character> SymbolExpression = new Stack<Character>();
+            StringBuilder PostfixExpression = new StringBuilder();
+
+            for (int index = 0; index < Expression.length(); index++) {
+                int priority = Priority(Expression.charAt(index));
+
+                if (priority == 0) PostfixExpression.append(Expression.charAt(index));
+
+                else if (priority == 1) SymbolExpression.push(Expression.charAt(index));
+
+                else if (Expression.charAt(index) == '-' && Expression.charAt(index-1) == '(') {
+
+                    PostfixExpression.append(Expression.charAt(index));
+                }
+
+                else if (priority > 1) {
+                    PostfixExpression.append(' ');
+
+                    while (!SymbolExpression.empty()) {
+                        if (Priority(SymbolExpression.peek()) >= priority)
+                            PostfixExpression.append(SymbolExpression.pop());
+                        else break;
+                    }
+
+                    SymbolExpression.push(Expression.charAt(index));
+                }
+
+                else if (priority == -1) {
+                    PostfixExpression.append(' ');
+
+                    while (Priority(SymbolExpression.peek()) != 1)
+                        PostfixExpression.append(SymbolExpression.pop());
+
+                    SymbolExpression.pop();
+                }
+            }
+
+            while (!SymbolExpression.empty()) {
+                PostfixExpression.append(' ');
+                PostfixExpression.append(SymbolExpression.pop());
+            }
+            Expression = PostfixExpression.toString();
+            System.out.println(Expression);
+            return true;
+        }
+    }
 
 }
