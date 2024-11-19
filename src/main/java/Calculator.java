@@ -1,3 +1,4 @@
+import java.util.Objects;
 import java.util.Stack;
 
 /**
@@ -182,4 +183,86 @@ public class Calculator {
         }
     }
 
+    /**
+     * A method that reads the value of an expression written in postfix form and writes the result in the field str.
+     * @return True if it was calculated, otherwise false.
+     */
+    public boolean Calculate() {
+
+        boolean IsPostfix = PostfixForm();
+        if (!IsPostfix) return false;
+        else {
+
+            StringBuilder Numbers = new StringBuilder();
+            Stack<Double> Calculations = new Stack<Double>();
+
+            for (int index = 0; index < Expression.length(); index++) {
+
+                if (Expression.charAt(index) == ' ') continue;
+
+                if (Expression.charAt(index) == '-' && Priority(Expression.charAt(index+1)) == 0){
+
+                    while (Expression.charAt(index) != ' ' && Priority(Expression.charAt(index)) == 0) {
+                        Numbers.append(Expression.charAt(index++));
+                        if (index == Expression.length()) break;
+                    }
+
+                    Calculations.push(Double.parseDouble(Numbers.toString()));
+                    Numbers = new StringBuilder();
+                }
+
+                if (Priority(Expression.charAt(index)) == 0){
+
+                    while (Expression.charAt(index) != ' ' && Priority(Expression.charAt(index)) == 0) {
+                        Numbers.append(Expression.charAt(index++));
+                        if (index == Expression.length()) break;
+                    }
+
+                    Calculations.push(Double.parseDouble(Numbers.toString()));
+                    Numbers = new StringBuilder();
+                }
+
+                if (Priority(Expression.charAt(index)) > 1) {
+
+                    double num1 = Calculations.pop();
+                    double num2 = Calculations.pop();
+
+                    if (Expression.charAt(index) == '+')
+                        Calculations.push(num2 + num1);
+
+                    if (Expression.charAt(index) == '-')
+                        Calculations.push(num2 - num1);
+
+                    if (Expression.charAt(index) == '*')
+                        Calculations.push(num2 * num1);
+
+                    if (Expression.charAt(index) == '/')
+                        Calculations.push(num2 / num1);
+                }
+            }
+            Expression = Double.toString(Calculations.pop());
+            return true;
+        }
+    }
+
+    /**
+     * The method that displays the value of the field str on the screen.
+     */
+    @Override
+    public String toString() {
+        return Expression;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Calculator that = (Calculator) obj;
+        return Objects.equals(Expression, that.Expression);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Expression);
+    }
 }
